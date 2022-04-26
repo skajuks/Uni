@@ -1,0 +1,2 @@
+
+                deleteFromIndex(index);

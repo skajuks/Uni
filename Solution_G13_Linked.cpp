@@ -29,21 +29,6 @@ size_t countElements(DataNode* head) {  // same logic as oldNode
     return elements;
 }
 
-void createNodeAtPos(int pos, int value, DataNode* &head) {
-    DataNode* prev = new DataNode;
-    DataNode* current = new DataNode;
-    DataNode* temp = new DataNode;
-    current = head;
-
-    for (int i = 0; i < pos; i++) {
-        prev = current;
-        current = current->next;
-    }
-    temp->data = value;
-    prev->next = temp;
-    temp->next = current;
-}
-
 void createNode(int &in, DataNode* &head, DataNode* &tail) {
     DataNode* temp = new DataNode;  // creating a temp node
     temp->data = in;  // assign node data to data from input
@@ -58,7 +43,7 @@ void createNode(int &in, DataNode* &head, DataNode* &tail) {
     }
 }
 
-void removeAndAddElement(DataNode* &head, int idx) {
+void removeElement(DataNode* &head, int idx) {
     DataNode* temp = nullptr;
     DataNode* current = head;
     int value = 0;
@@ -67,7 +52,7 @@ void removeAndAddElement(DataNode* &head, int idx) {
         temp = head->next;
         value = head->data;
         delete head;
-        createNodeAtPos(idx, value, head);
+        std::cout << "Deleted node with value : " << value << std::endl;
     } else {
         for (int i = 0; i < idx - 1; i++) {
             current = current->next;
@@ -77,7 +62,7 @@ void removeAndAddElement(DataNode* &head, int idx) {
         value = temp->data;
         current->next = temp->next;
         delete temp;
-        createNodeAtPos(idx, value, head);
+        std::cout << "Deleted node with value : " << value << std::endl;
     }
 }
 
@@ -116,7 +101,7 @@ int main() {
 
     } while (index - 1 > countElements(head)); // loop while element is not bigger then list size
 
-    removeAndAddElement(head, index);  // Do the magic
+    removeElement(head, index);  // Do the magic
 
     printLinkedList(head); // Print out our list of integers after the swap
 

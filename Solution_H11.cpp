@@ -15,13 +15,7 @@ public:
     bool status;
 
     Data() {};
-    Data(const int &id, const string &input, bool &status) {
-        this->id = id;
-        if (input.length() > 30)
-            cout << "string too long lol" << endl;
-        strcpy(this->word ,input.c_str());
-        this->status = status;
-    }
+    ~Data() {};
 };
 
 enum States : int {     // hold enumerations for all states to be accessed via switch statement
@@ -32,12 +26,12 @@ enum States : int {     // hold enumerations for all states to be accessed via s
 };
 
 inline map<int, map<string, bool>> readFromBinaryFile(string filename) {
-	ifstream file(filename, ios::binary);
+	ifstream file(filename, ios::binary);   // read in file
 
 	map<int, map<string, bool>> temp;
 	Data dta;
-	while (file.read((char*)&dta, sizeof(Data))) {
-		temp[dta.id].insert(make_pair(dta.word, dta.status));
+	while (file.read((char*)&dta, sizeof(Data))) {  // itterate through entries
+		temp[dta.id].insert(make_pair(dta.word, dta.status));   // assign data to map
 	}
 
 	file.close();
@@ -45,20 +39,25 @@ inline map<int, map<string, bool>> readFromBinaryFile(string filename) {
 }
 
 inline void writeToBinaryFile(const map<int, map<string, bool>> items, string filename) {
-	ofstream file(filename, ios::binary);
-    for (auto const& item : items) {
-        Data dta;
+	ofstream file(filename, ios::binary);   // get our file
+    for (auto const& item : items) {    // loop to get data from first map
+        Data dta;   // temp buffer to store our data
         dta.id = item.first;
-        for (auto const& pair : item.second) {
+        for (auto const& pair : item.second) {  // get data from nested map
+            if (pair.first.length() > 30) {
+                std::cout << "[Error] : String " <<  pair.first << " is longer then 30 chars" << std::endl;
+                throw("[Error] : String %s is longer then 30 chars", pair.first.c_str());
+            }
             strcpy(dta.word, pair.first.c_str());
             dta.status = pair.second;
         }
-		file.write((char*)&dta, sizeof(Data));
+		file.write((char*)&dta, sizeof(Data));  // write from temp buffer
     }
 	file.close();
 }
 
 inline void printMap(map<int, map<string, bool>> const& inputMap) {
+    // basic looping through nested map and simply printing to console
 	for (auto const& item : inputMap) {
         cout << item.first << " ";
         for (auto const& pair : item.second) {
@@ -68,6 +67,7 @@ inline void printMap(map<int, map<string, bool>> const& inputMap) {
 }
 
 inline void printMapNonDeleted(map<int, map<string, bool>> const& inputMap) {
+    // same thing as before, just this time checking for bool
 	for (auto const& item : inputMap) {
         for (auto const& pair : item.second) {
             if(!pair.second)
@@ -77,31 +77,57 @@ inline void printMapNonDeleted(map<int, map<string, bool>> const& inputMap) {
 }
 
 inline void deleteFromIndex(map<int, map<string, bool>> &datamap, int &indx) {
-    auto it = datamap.find(indx);
-    for (auto i = it->second.begin(); i != it->second.end(); ++i)
+    auto it = datamap.find(indx);       // find data entry from index
+    for (auto i = it->second.begin(); i != it->second.end(); ++i)   // some weird way to get access to our bool value
         i->second = true;
 }
 
 inline void purgeRecords(map<int, map<string, bool>>& inputMap) {
     vector<int> eraseKeys;
+    // get keys of all entries we want to delete
     for (auto const& item : inputMap) {
         for (auto const& pair : item.second) {
             if(pair.second)
                 eraseKeys.push_back(item.first);
         }
     }
+    // loop our key array and delete them from map
     for (auto const& key : eraseKeys)
         inputMap.erase(key);
 }
 
 int main() {
-    map<int, map<string, bool>> createFileData;
-    for (int i = 0; i < 10; i++) {
-        createFileData[i].insert(make_pair("Jenots", false));
-    }
-    writeToBinaryFile(createFileData, "binary_data.bin");
 
-    map<int, map<string, bool>> binaryData = readFromBinaryFile("binary_data.bin");
+    // File setup for test case 1
+
+    map<int, map<string, bool>> createFileData_1;
+
+    // basic for loop to insert some dummy data here, can be changed to insert individual entites
+    for (int i = 1; i < 10; i++) {
+        createFileData_1[i].insert(make_pair("Test_String_" + to_string(i), false));
+    }
+    // extras
+    createFileData_1[11].insert(make_pair("Jenots", true));
+    createFileData_1[12].insert(make_pair("Lacis", false));
+    createFileData_1[13].insert(make_pair("Lapsa", true));
+    writeToBinaryFile(createFileData_1, "test_case_1.bin");
+
+    // File setup for test case 2
+
+    map<int, map<string, bool>> createFileData_2;
+
+    // basic for loop to insert some dummy data here, can be changed to insert individual entites
+    for (int i = 1; i < 5; i++) {
+        createFileData_2[i].insert(make_pair("Test_String_" + to_string(i), false));
+    }
+    // extras
+    createFileData_2[14].insert(make_pair("Atomelektrostacija_Atomelektrostacija_Atomelektrostacija", false));    // throw an error
+    writeToBinaryFile(createFileData_2, "test_case_2.bin");
+
+    // Lets read data from our bin file
+    const string test_file = "binary_data.bin"; // change test case
+
+    map<int, map<string, bool>> binaryData = readFromBinaryFile(test_file);
 
     int input;
     do {
@@ -112,18 +138,19 @@ int main() {
                 int id;
                 cout << "Input id for record to be deleted : " << endl;
                 cin >> id;
-                deleteFromIndex(binaryData, id);
+                deleteFromIndex(binaryData, id);    // change boolean state
                 break;
             case States::STATE_PRINT_NON_DELETED:
-                printMapNonDeleted(binaryData);
+                printMapNonDeleted(binaryData);     // print all with bool state false
                 break;
             case States::STATE_PRINT_ALL_RECORDS:
-                printMap(binaryData);
+                printMap(binaryData);   // print all
                 break;
             case States::STATE_PURGE_ALL_RECORDS:
-                purgeRecords(binaryData);
+                purgeRecords(binaryData);   // delete map entries with bool state false
                 break;
             default : break;
         }
     } while (input != 0);
 }
+
