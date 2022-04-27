@@ -1,43 +1,47 @@
 #include <iostream>
 #include <list>
 
-void printList(std::list<int> input) {
+using namespace std;
+
+void printList(list<int> &input) {
     // Iterate over list elements
     for (auto &element : input) {
-        std::cout << element << " ";
+        cout << element << " ";
     }
-    std::cout << std::endl;
+    cout << endl;
 }
 
-size_t countElements(std::list<int> input) {
+size_t countElements(list<int> &input) {
     return input.size();
 }
 
-void removeAndAddElement(std::list<int> input, int& idx) {
+void removeAndAddElement(list<int> &input, int& idx) {
 
-    auto destroy = std::next(input.begin(), idx - 1);  // get element to remove from index
-    auto replace_with = std::next(input.begin(), *destroy - 1);  // get element value to put back
+    auto itter = next(input.begin(), idx - 1);  // get element to remove from index
+    auto itter2 = next(input.begin(), *itter - 1);  // get element value to put back
 
-    input.erase(destroy); // remove element from list
-    input.insert(destroy, *replace_with);   // place it back in the list
+    itter = next(input.begin(), idx - 1);
+    input.erase(itter); // remove element from list
+    itter = next(input.begin(), idx - 1);
+    input.insert(itter, *itter2);   // place it back in the list
 }
 
 int main() {
     // initialize list
-    std::list<int> inputList;
+    list<int> inputList;
 
     // Input handler for list
     int input;
-    std::cout << "Ievadiet sarakstu! Ievadiet 0, lai beigtu!" << std::endl;
+    cout << "Enter elements for list, press 0 to stop" << endl;
 
     do {
-        std::cin >> input;  // get the input
+        cin >> input;  // get the input
 
         if (input == 0) {
             if (!inputList.empty()) {
                 break;  // if input equals 0, break loop
             } else {
-                std::cout << "Tukss saraksts. Meginiet velreiz!" << std::endl;
+                cout << "Empty list, try again!" << endl;
                 input = 1; // Small hack to prevent while loop from exiting
             }
         } else {
@@ -50,10 +54,10 @@ int main() {
     // Input handler for element
     int index;
     do {
-        std::cout << "Ievadiet indeksu : " << std::endl;
-        std::cin >> index; // get n'th element of list to perform action on
+        cout << "Enter index : " << endl;
+        cin >> index; // get n'th element of list to perform action on
         if (index - 1 > countElements(inputList))   // check if element is not bigger then list size
-            std::cout << "Nepastav " << index << ". elementa! Meginiet velreiz!" << std::endl;
+            cout << index << " <- Index doesnt exist, try again!" << endl;
 
     } while (index - 1 > countElements(inputList)); // loop while element is not bigger then list size
 
@@ -64,4 +68,12 @@ int main() {
     return 0;
 }
 
-
+// Test cases
+/*
+    Entry list : 1 2 3 4 6 7        idx = 4     output = 1 2 3 4 6 7                  = GOOD
+    Entry list : 4 5 1 2 1          idx = 1     output = 2 5 1 2 1                    = GOOD
+    Entry list : 1 2 3              idx = 2     output = 1 2 3                        = GOOD
+    Entry list :                    idx =       output = Empty list, try again!       = GOOD
+    Entry list : 1                  idx = 1     output = 1                            = GOOD
+    Entry list : 1                  idx = 3     output = 3 <- Index doesnt exist, try again! = GOOD
+*/
