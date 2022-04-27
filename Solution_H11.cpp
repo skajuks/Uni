@@ -46,7 +46,7 @@ inline void writeToBinaryFile(const map<int, map<string, bool>> items, string fi
         for (auto const& pair : item.second) {  // get data from nested map
             if (pair.first.length() > 30) {
                 std::cout << "[Error] : String " <<  pair.first << " is longer then 30 chars" << std::endl;
-                throw("[Error] : String %s is longer then 30 chars", pair.first.c_str());
+                throw("");
             }
             strcpy(dta.word, pair.first.c_str());
             dta.status = pair.second;
@@ -103,13 +103,12 @@ int main() {
     map<int, map<string, bool>> createFileData_1;
 
     // basic for loop to insert some dummy data here, can be changed to insert individual entites
-    for (int i = 1; i < 10; i++) {
+    for (int i = 1; i < 3; i++) {
         createFileData_1[i].insert(make_pair("Test_String_" + to_string(i), false));
     }
     // extras
     createFileData_1[11].insert(make_pair("Jenots", true));
     createFileData_1[12].insert(make_pair("Lacis", false));
-    createFileData_1[13].insert(make_pair("Lapsa", true));
     writeToBinaryFile(createFileData_1, "test_case_1.bin");
 
     // File setup for test case 2
@@ -117,7 +116,7 @@ int main() {
     map<int, map<string, bool>> createFileData_2;
 
     // basic for loop to insert some dummy data here, can be changed to insert individual entites
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 2; i++) {
         createFileData_2[i].insert(make_pair("Test_String_" + to_string(i), false));
     }
     // extras
@@ -125,7 +124,7 @@ int main() {
     writeToBinaryFile(createFileData_2, "test_case_2.bin");
 
     // Lets read data from our bin file
-    const string test_file = "binary_data.bin"; // change test case
+    const string test_file = "test_case_1.bin"; // change test case
 
     map<int, map<string, bool>> binaryData = readFromBinaryFile(test_file);
 
@@ -154,3 +153,40 @@ int main() {
     } while (input != 0);
 }
 
+// Test case
+// case 1 :
+/*
+    File writes without issues
+
+    Content:
+        1 Test_String_1 0
+        2 Test_String_2 0
+        3 Test_String_3 0
+        11 Jenots 1
+        12 Lacis 0
+
+    Output after option 1 -> delete id 2
+        1 Test_String_1 0
+        2 Test_String_2 1
+        3 Test_String_3 0
+        11 Jenots 1
+        12 Lacis 0
+    Output after option 2 -> print all non deleted entries
+        1 Test_String_1 0
+        3 Test_String_3 0
+        12 Lacis 0
+    Output after option 3 -> print all entries
+        1 Test_String_1 0
+        2 Test_String_2 1
+        3 Test_String_3 0
+        11 Jenots 1
+        12 Lacis 0
+    Output after option 4 -> purge all deleted entries
+        1 Test_String_1 0
+        3 Test_String_3 0
+        12 Lacis 0
+*/
+//case 2 :
+/*
+    File write generates error -> [Error] : String Atomelektrostacija_Atomelektrostacija_Atomelektrostacija is longer then 30 chars
+*/
