@@ -108,3 +108,13 @@ int main() {
     return 0;
 
 }
+
+// Test cases
+/*
+    Entry list : 1 2 3 4 6 7        idx = 4     output = 1 2 3 6 7                    = GOOD
+    Entry list : 4 5 1 2 1          idx = 1     output = 5 1 2 1                      = GOOD
+    Entry list : 1 2 3              idx = 2     output = 1 3                          = GOOD
+    Entry list :                    idx =       output = Empty list, try again!       = GOOD
+    Entry list : 1                  idx = 1     output =                              = GOOD
+    Entry list : 1                  idx = 3     output = 3 -> Index doesnt exist, try again! = GOOD
+*/
