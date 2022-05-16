@@ -22,7 +22,9 @@ enum States : int {     // hold enumerations for all states to be accessed via s
     STATE_DELETE_RECORD = 1,
     STATE_PRINT_NON_DELETED,
     STATE_PRINT_ALL_RECORDS,
-    STATE_PURGE_ALL_RECORDS
+    STATE_PURGE_ALL_RECORDS,
+    STATE_CREATE_BINARY_FILE,
+    STATE_LOAD_BINARY_FILE
 };
 
 inline map<int, map<string, bool>> readFromBinaryFile(string filename) {
@@ -96,41 +98,36 @@ inline void purgeRecords(map<int, map<string, bool>>& inputMap) {
         inputMap.erase(key);
 }
 
+inline void createBinaryFile() {
+    cout << "Usage -> 'string bool' , enter 2 in boolean place to end" << endl;
+    map<int, map<string, bool>> binartyData;
+    int input, counter = 0;
+    string input_string;
+    do {
+        cin >> input_string >> input;  // get the input
+
+        if (input == 2) {
+            if (!binartyData.empty()) {
+                break;  // if input equals 2, break loop
+            } else {
+                cout << "Empty array, try again!" << endl;
+                input = 1; // Small hack to prevent while loop from exiting
+            }
+        } else {
+             binartyData[counter].insert(make_pair(input_string, (bool)input));  // emplace input into list
+             counter++;
+        }
+    } while(input != 2);    // keep the loop going while input != 2
+    writeToBinaryFile(binartyData, "created_bin_file.bin");
+}
+
 int main() {
 
-    // File setup for test case 1
-
-    map<int, map<string, bool>> createFileData_1;
-
-    // basic for loop to insert some dummy data here, can be changed to insert individual entites
-    for (int i = 1; i < 3; i++) {
-        createFileData_1[i].insert(make_pair("Test_String_" + to_string(i), false));
-    }
-    // extras
-    createFileData_1[11].insert(make_pair("Jenots", true));
-    createFileData_1[12].insert(make_pair("Lacis", false));
-    writeToBinaryFile(createFileData_1, "test_case_1.bin");
-
-    // File setup for test case 2
-
-    map<int, map<string, bool>> createFileData_2;
-
-    // basic for loop to insert some dummy data here, can be changed to insert individual entites
-    for (int i = 1; i < 2; i++) {
-        createFileData_2[i].insert(make_pair("Test_String_" + to_string(i), false));
-    }
-    // extras
-    createFileData_2[14].insert(make_pair("Atomelektrostacija_Atomelektrostacija_Atomelektrostacija", false));    // throw an error
-    writeToBinaryFile(createFileData_2, "test_case_2.bin");
-
-    // Lets read data from our bin file
-    const string test_file = "test_case_1.bin"; // change test case
-
-    map<int, map<string, bool>> binaryData = readFromBinaryFile(test_file);
+    map<int, map<string, bool>> binaryData;
 
     int input;
     do {
-        cout << "1 : [delete] 2 : [print non-deleted] 3 : [print all] 4 : [purge deleted] " << endl;
+        cout << "1 : [delete] 2 : [print non-deleted] 3 : [print all] 4 : [purge deleted] 5 : [create binary file] 6 : [load binary file]" << endl;
         cin >> input;
         switch (input) {    // State machine go brrrr
             case States::STATE_DELETE_RECORD:
@@ -147,6 +144,13 @@ int main() {
                 break;
             case States::STATE_PURGE_ALL_RECORDS:
                 purgeRecords(binaryData);   // delete map entries with bool state false
+                break;
+            case States::STATE_CREATE_BINARY_FILE:
+                createBinaryFile();
+                break;
+            case States::STATE_LOAD_BINARY_FILE:
+                binaryData = readFromBinaryFile("created_bin_file.bin");
+                cout << "File loaded!" << endl;
                 break;
             default : break;
         }
