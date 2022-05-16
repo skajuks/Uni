@@ -15,15 +15,22 @@ size_t countElements(list<int> &input) {
     return input.size();
 }
 
-void removeAndAddElement(list<int> &input, int& idx) {
+void removeAndAddElement(list<int> &input, int& n) {
 
-    auto itter = next(input.begin(), idx - 1);  // get element to remove from index
-    auto itter2 = next(input.begin(), *itter - 1);  // get element value to put back
+    list<int>::iterator itter = next(input.begin(), n - 1);  // get element to remove from index
 
-    itter = next(input.begin(), idx - 1);
-    input.erase(itter); // remove element from list
-    itter = next(input.begin(), idx - 1);
-    input.insert(itter, *itter2);   // place it back in the list
+    if (*itter > countElements(input)) {    // check if element can be inserted
+        cout << "Error, element with index " << *itter << " does not exist" << endl;
+        return;
+    }
+
+    list<int>::iterator itter2 = input.begin();
+    advance(itter2, n - 1); // get the index of our value in list
+
+    input.erase(itter);
+
+    list<int>::iterator itter3 = next(input.begin(), *itter - 1);   // get the value from index using our first itter value
+    input.insert(itter3, *itter2);
 }
 
 int main() {
